@@ -1,0 +1,15 @@
+{
+  "name": "img2mythicmobs",
+  "version": "1.0.0",
+  "description": "Easy Img to Mythicmobs projectile like graphic",
+  "main": "coordenadas.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Allen Dimetri",
+  "license": "ISC",
+  "dependencies": {
+    "jimp": "^0.16.1",
+	"sharp": "^0.30.7"
+  }
+}
