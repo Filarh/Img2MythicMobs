@@ -5,17 +5,17 @@ const sharp = require('sharp')
 const ruta = './for_particles/'
 
 /////easy/////////
-      const imginput = 'sample'
+      const imginput = 'sword'
       ////después de cuantos pasos iniciar el dibujo///////
       const offset = 4
       ////si el dibujo va en el suelo o vertical////
-      const vertical = 0
+      const vertical = 1
       const colored = 1
       ///compresión de la imagen, que tan grande puede representarse en relación a su resolución 128/(0.06)////
-      const compresion = 0.06
-      const resolution = 128
+      const compresion = 0.05
+      const resolution = 175
       //hoyos para optimización, dejalo en 1 si no deseas optimizar
-      const holes = 1
+      const holes = 3
       /////tamáño máximo de los puntos (0.8)//////
       let particlesize = 0.8
       //duracion de las partículas// 
@@ -26,22 +26,25 @@ const ruta = './for_particles/'
 
 
 //nombre del archivo
-const skillname = 'output'
+const skillname = 'dibujo'
 //nombre de la skill//
-let hname = 'sample'
+let hname = 'Draw'
 //nombre del tick de la skill//
-let defaultOT = 'sampleT'
+let defaultOT = 'dT'
 //////////////////////
 
 
 //const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 async function makescript(){
-const pi = await sharp(ruta + imginput + '.png').resize(resolution).png().toBuffer()
+//const pi = await sharp(ruta + imginput + '.png').resize([{fit:'inside',width:resolution}]).png().toBuffer()
+const pi = await sharp(ruta + imginput + '.png').resize(null,resolution).png().toBuffer()
+await sharp(pi).png().toFile('miratuwbda.png')
 const image = await Jimp.read(pi);
 
 const XXX = image.bitmap.width 
 const YYY = image.bitmap.height 
 scrapx(XXX,YYY,image)
+console.log(XXX + ' ' + YYY)
 }
 
 function scrapx(a,b,image){
@@ -62,7 +65,7 @@ function scrapx(a,b,image){
           sas = Jimp.intToRGBA(image.getPixelColor(xc,yc))
           //console.log(sas.a + ' tu wbda: ' + (sas.a * 0.8/ 255).toFixed(2))
           
-          if (sas.a > 0) {
+          if (sas.a > 30 ) {
             curx=  relativeX - xc
             cury= relativeY - yc          
             curx = (curx * compresion).toFixed(2)
@@ -71,13 +74,17 @@ function scrapx(a,b,image){
             if (!!colored){
               let sus = image.getPixelColor(xc,yc);
               let hexString = sus.toString(16).slice(0,-2);
+              if (hexString.length < 3){ 
+                console.log(' X: ' + xc + ' Y: ' + yc + ' raw: ' + sus + ' +' + sus.toString(16) + ' ' + JSON.stringify(sas))
+                hexString = '000000'
+              }
               if (!!dynamicsize) particlesize = (sas.a * opz / 255).toFixed(2)
               
               defaultOT = `[effect:particles{p=reddust;color=#${hexString};amount=1;size=${particlesize}}]`
             }
 
-            if (!vertical) data += ` - projectile{g=-0.002;hp=false;oT=${defaultOT};hR=1;vR=1;sB=false;sE=false;syo=0;sso=${curx};sfo=${cury};d=${duracion};MaxRange=1;v=0} \n`
-            if (!!vertical) data += ` - projectile{g=-0.002;hp=false;oT=${defaultOT};hR=1;vR=1;sB=false;sE=false;syo=${cury};sso=${curx};sfo=0;d=${duracion};MaxRange=1;v=0} \n`
+            if (!vertical) data += ` - projectile{g=-0.0002;hp=false;oT=${defaultOT};hR=1;vR=1;sB=false;sE=false;syo=0;sso=${curx};sfo=${cury};d=${duracion};MaxRange=1;v=0} \n`
+            if (!!vertical) data += ` - projectile{g=-0.0002;hp=false;oT=${defaultOT};hR=1;vR=1;sB=false;sE=false;syo=${cury};sso=${curx};sfo=0;d=${duracion};MaxRange=1;v=0} \n`
             //data += ` - projectile{hp=false;g=-0.002;oT=[effect:particles{p=reddust;color=#${genRanHex(6)};amount=1;size:0.06}];sB=false;sE=false;syo=0;sso=${curx};sfo=${cury};d=50;MaxRange=1;v=0} \n`
         }
       }
@@ -99,5 +106,5 @@ console.log("\x1b[34m",' Resolución: ' + resolution + ' /c: ' + compresion + ' 
 console.log("\x1b[35m",' Coloreado: ' + !!colored)
 console.log("\x1b[31m",' Vertical: ' + !!vertical)
 console.log("\x1b[33m",' Offset: ' + offset)
-console.log("\x1b[35m",' Dynamic Size: ' + !!dynamicsize)
+console.log("\x1b[37m",' Dynamic Size: ' + !!dynamicsize)
 makescript()
